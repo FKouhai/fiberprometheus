@@ -2,10 +2,11 @@
 
 Prometheus middleware for gofiber.
 
-**Note: Requires Go 1.21 and above**
+Forked from [ansrivas](https://github.com/ansrivas/fiberprometheus)
+
+**Note: Requires Go 1.22 and above**
 
 ![Release](https://img.shields.io/github/release/ansrivas/fiberprometheus.svg)
-[![Discord](https://img.shields.io/badge/discord-join%20channel-7289DA)](https://gofiber.io/discord)
 ![Test](https://github.com/ansrivas/fiberprometheus/workflows/Test/badge.svg)
 ![Security](https://github.com/ansrivas/fiberprometheus/workflows/Security/badge.svg)
 ![Linter](https://github.com/ansrivas/fiberprometheus/workflows/Linter/badge.svg)
@@ -19,21 +20,21 @@ http_requests_in_progress_total
 http_cache_results
 ```
 
-### Install v2
+### Install v3
 
 ```
-go get -u github.com/gofiber/fiber/v2
-go get -u github.com/ansrivas/fiberprometheus/v2
+go get -u github.com/gofiber/fiber/v3
+go get -u github.com/FKouhai/fiberprometheus/v3
 ```
 
-### Example using v2
+### Example using v3
 
 ```go
 package main
 
 import (
-	"github.com/ansrivas/fiberprometheus/v2"
-	"github.com/gofiber/fiber/v2"
+	"github.com/FKouhai/fiberprometheus/v3"
+	"github.com/gofiber/fiber/v3"
 )
 
 func main() {
@@ -44,9 +45,9 @@ func main() {
   // or
   // labels := map[string]string{"custom_label1":"custom_value1", "custom_label2":"custom_value2"}
   // fiberprometheus.NewWithLabels(labels, namespace, subsystem )
-  prometheus := fiberprometheus.New("my-service-name")
-  prometheus.RegisterAt(app, "/metrics")
-  app.Use(prometheus.Middleware)
+  prom := prometheus.New("my-service-name")
+  prom.RegisterAt(&app, "/metrics")
+  app.Use(prom.Middleware)
 
   app.Get("/", func(c *fiber.Ctx) error {
     return c.SendString("Hello World")

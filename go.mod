@@ -1,4 +1,4 @@
-module github.com/ansrivas/fiberprometheus/v3
+module github.com/FKouhai/fiberprometheus/v3
 
 go 1.22
 

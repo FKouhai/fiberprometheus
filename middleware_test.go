@@ -28,9 +28,9 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/gofiber/fiber/v2"
-	"github.com/gofiber/fiber/v2/middleware/basicauth"
-	"github.com/gofiber/fiber/v2/middleware/cache"
+	"github.com/gofiber/fiber/v3"
+	"github.com/gofiber/fiber/v3/middleware/basicauth"
+	"github.com/gofiber/fiber/v3/middleware/cache"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/collectors"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
@@ -44,10 +44,10 @@ func TestMiddleware(t *testing.T) {
 	prometheus := New("test-service")
 	prometheus.RegisterAt(app, "/metrics")
 	app.Use(prometheus.Middleware)
-	app.Get("/", func(c *fiber.Ctx) error {
+	app.Get("/", func(c fiber.Ctx) error {
 		return c.SendString("Hello World")
 	})
-	app.Get("/error/:type", func(ctx *fiber.Ctx) error {
+	app.Get("/error/:type", func(ctx fiber.Ctx) error {
 		switch ctx.Params("type") {
 		case "fiber":
 			return fiber.ErrBadRequest
@@ -117,10 +117,10 @@ func TestMiddlewareWithGroup(t *testing.T) {
 	public := app.Group("/public")
 
 	// Define Group Routes
-	public.Get("/", func(c *fiber.Ctx) error {
+	public.Get("/", func(c fiber.Ctx) error {
 		return c.SendString("Hello World")
 	})
-	public.Get("/error/:type", func(ctx *fiber.Ctx) error {
+	public.Get("/error/:type", func(ctx fiber.Ctx) error {
 		switch ctx.Params("type") {
 		case "fiber":
 			return fiber.ErrBadRequest
@@ -184,16 +184,16 @@ func TestMiddlewareOnRoute(t *testing.T) {
 	prometheus := New("test-route")
 	prefix := "/prefix/path"
 
-	app.Route(prefix, func(route fiber.Router) {
-		prometheus.RegisterAt(route, "/metrics")
-	}, "Prefixed Route")
+	app.Get(prefix, func(c fiber.Ctx) error {
+		return c.Next()
+	})
 	app.Use(prometheus.Middleware)
 
-	app.Get("/", func(c *fiber.Ctx) error {
+	app.Get("/", func(c fiber.Ctx) error {
 		return c.SendString("Hello World")
 	})
 
-	app.Get("/error/:type", func(ctx *fiber.Ctx) error {
+	app.Get("/error/:type", func(ctx fiber.Ctx) error {
 		switch ctx.Params("type") {
 		case "fiber":
 			return fiber.ErrBadRequest
@@ -259,7 +259,7 @@ func TestMiddlewareWithServiceName(t *testing.T) {
 	prometheus := NewWith("unique-service", "my_service_with_name", "http")
 	prometheus.RegisterAt(app, "/metrics")
 	app.Use(prometheus.Middleware)
-	app.Get("/", func(c *fiber.Ctx) error {
+	app.Get("/", func(c fiber.Ctx) error {
 		return c.SendString("Hello World")
 	})
 	req := httptest.NewRequest("GET", "/", nil)
@@ -301,7 +301,7 @@ func TestMiddlewareWithLabels(t *testing.T) {
 	prometheus := NewWithLabels(constLabels, "my_service", "http")
 	prometheus.RegisterAt(app, "/metrics")
 	app.Use(prometheus.Middleware)
-	app.Get("/", func(c *fiber.Ctx) error {
+	app.Get("/", func(c fiber.Ctx) error {
 		return c.SendString("Hello World")
 	})
 	req := httptest.NewRequest("GET", "/", nil)
@@ -345,7 +345,7 @@ func TestMiddlewareWithBasicAuth(t *testing.T) {
 
 	app.Use(prometheus.Middleware)
 
-	app.Get("/", func(c *fiber.Ctx) error {
+	app.Get("/", func(c fiber.Ctx) error {
 		return c.SendString("Hello World")
 	})
 
@@ -379,7 +379,7 @@ func TestMiddlewareWithCustomRegistry(t *testing.T) {
 	promfiber := NewWithRegistry(registry, "unique-service", "my_service_with_name", "http", nil)
 	app.Use(promfiber.Middleware)
 
-	app.Get("/", func(c *fiber.Ctx) error {
+	app.Get("/", func(c fiber.Ctx) error {
 		return c.SendString("Hello World")
 	})
 	req := httptest.NewRequest("GET", "/", nil)
@@ -432,7 +432,7 @@ func TestCustomRegistryRegisterAt(t *testing.T) {
 
 	app.Use(fpCustom.Middleware)
 
-	app.Get("/", func(c *fiber.Ctx) error {
+	app.Get("/", func(c fiber.Ctx) error {
 		return c.SendString("Hello, world!")
 	})
 	req := httptest.NewRequest("GET", "/", nil)
@@ -478,7 +478,7 @@ func TestWithCacheMiddleware(t *testing.T) {
 	app.Use(fpCustom.Middleware)
 	app.Use(cache.New())
 
-	app.Get("/myPath", func(c *fiber.Ctx) error {
+	app.Get("/myPath", func(c fiber.Ctx) error {
 		return c.SendString("Hello, world!")
 	})
 
@@ -541,7 +541,7 @@ func TestWithCacheMiddlewareWithCustomKey(t *testing.T) {
 		},
 	))
 
-	app.Get("/myPath", func(c *fiber.Ctx) error {
+	app.Get("/myPath", func(c fiber.Ctx) error {
 		return c.SendString("Hello, world!")
 	})
 
@@ -594,7 +594,7 @@ func Benchmark_Middleware(b *testing.B) {
 	prometheus.RegisterAt(app, "/metrics")
 	app.Use(prometheus.Middleware)
 
-	app.Get("/", func(c *fiber.Ctx) error {
+	app.Get("/", func(c fiber.Ctx) error {
 		return c.SendString("Hello World")
 	})
 
@@ -621,7 +621,7 @@ func Benchmark_Middleware_Parallel(b *testing.B) {
 	prometheus.RegisterAt(app, "/metrics")
 	app.Use(prometheus.Middleware)
 
-	app.Get("/", func(c *fiber.Ctx) error {
+	app.Get("/", func(c fiber.Ctx) error {
 		return c.SendString("Hello World")
 	})
 

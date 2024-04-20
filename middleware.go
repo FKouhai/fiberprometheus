@@ -25,12 +25,13 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/gofiber/fiber/v2"
-	"github.com/gofiber/fiber/v2/middleware/adaptor"
-	"github.com/gofiber/fiber/v2/utils"
+	"github.com/gofiber/fiber/v3"
+	"github.com/gofiber/fiber/v3/middleware/adaptor"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promauto"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
+  "unsafe"
+  "reflect"
 )
 
 // FiberPrometheus ...
@@ -43,6 +44,19 @@ type FiberPrometheus struct {
 	cacheCounter    *prometheus.CounterVec
 	defaultURL      string
 }
+func CopyString(s string) string {
+	return string(UnsafeBytes(s))
+}
+func UnsafeBytes(s string) []byte {
+	if s == "" {
+		return nil
+	}
+
+	return (*[MaxStringLen]byte)(unsafe.Pointer(
+		(*reflect.StringHeader)(unsafe.Pointer(&s)).Data),
+	)[:len(s):len(s)]
+}
+const MaxStringLen = 0x7fff0000
 
 func create(registry prometheus.Registerer, serviceName, namespace, subsystem string, labels map[string]string) *FiberPrometheus {
 	if registry == nil {
@@ -195,11 +209,11 @@ func (ps *FiberPrometheus) RegisterAt(app fiber.Router, url string, handlers ...
 	ps.defaultURL = url
 
 	h := append(handlers, adaptor.HTTPHandler(promhttp.HandlerFor(ps.gatherer, promhttp.HandlerOpts{})))
-	app.Get(ps.defaultURL, h...)
+	app.Get(ps.defaultURL,nil, h...)
 }
 
 // Middleware is the actual default middleware implementation
-func (ps *FiberPrometheus) Middleware(ctx *fiber.Ctx) error {
+func (ps *FiberPrometheus) Middleware(ctx fiber.Ctx) error {
 	start := time.Now()
 	path := string(ctx.Request().RequestURI())
 
@@ -233,7 +247,7 @@ func (ps *FiberPrometheus) Middleware(ctx *fiber.Ctx) error {
 	ps.requestsTotal.WithLabelValues(statusCode, method, path).Inc()
 
 	// Update the cache counter
-	cacheResult := utils.CopyString(ctx.GetRespHeader(ps.cacheHeaderKey, ""))
+	cacheResult := CopyString(ctx.GetRespHeader(ps.cacheHeaderKey, ""))
 	if cacheResult != "" {
 		ps.cacheCounter.WithLabelValues(statusCode, method, path, cacheResult).Inc()
 	}

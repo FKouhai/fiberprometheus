@@ -1,5 +1,10 @@
 ## ChangeLog
 ---
+## [2024-04-21] - v3.0.0
+### Refactor to fiberv3
+- Updated dependencies to use fiber v3
+- Updated tests to use v3 as well
+
 ## [2021-03-29] - v2.1.2
 ### Bug Fix:
 - Fixes #39, thanks @sunhailin-Leo

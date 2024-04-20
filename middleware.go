@@ -209,7 +209,9 @@ func (ps *FiberPrometheus) RegisterAt(app fiber.Router, url string, handlers ...
 	ps.defaultURL = url
 
 	h := append(handlers, adaptor.HTTPHandler(promhttp.HandlerFor(ps.gatherer, promhttp.HandlerOpts{})))
-	app.Get(ps.defaultURL,nil, h...)
+	app.Get(ps.defaultURL,func (c fiber.Ctx) error  {
+    return c.Next()
+	}, h...)
 }
 
 // Middleware is the actual default middleware implementation

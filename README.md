@@ -2,14 +2,16 @@
 
 Prometheus middleware for gofiber.
 
-Forked from [ansrivas](https://github.com/ansrivas/fiberprometheus)
+Forked from [ansrivas](https://github.com/ansrivas/fiberprometheus) <br>
+
+Please feel free to open any issue with possible enhancements or bugs
 
 **Note: Requires Go 1.22 and above**
 
-![Release](https://img.shields.io/github/release/ansrivas/fiberprometheus.svg)
-![Test](https://github.com/ansrivas/fiberprometheus/workflows/Test/badge.svg)
-![Security](https://github.com/ansrivas/fiberprometheus/workflows/Security/badge.svg)
-![Linter](https://github.com/ansrivas/fiberprometheus/workflows/Linter/badge.svg)
+![Release](https://img.shields.io/github/release/FKouhai/fiberprometheus.svg)
+![Test](https://github.com/FKouhai/fiberprometheus/workflows/Test/badge.svg)
+![Security](https://github.com/FKouhai/fiberprometheus/workflows/Security/badge.svg)
+![Linter](https://github.com/FKouhai/fiberprometheus/workflows/Linter/badge.svg)
 
 Following metrics are available by default:
 
